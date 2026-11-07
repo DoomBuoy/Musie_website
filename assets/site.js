@@ -53,6 +53,19 @@
     });
   }
 
+  // Downloads are served from this site (downloads/, added by the Pages
+  // workflow). If they aren't there yet, fall back to the GitHub release.
+  const RELEASE_DL = 'https://github.com/' + REPO + '/releases/latest/download/';
+  [['apkBtn', 'musie.apk'], ['pluginBtn', 'ystream-plugin.zip']].forEach(([id, file]) => {
+    const a = document.getElementById(id);
+    fetch(a.getAttribute('href'), { method: 'HEAD', cache: 'no-store' })
+      .then((r) => { if (!r.ok) throw r.status; })
+      .catch(() => {
+        a.href = RELEASE_DL + file;
+        a.removeAttribute('download');
+      });
+  });
+
   fetch(API, { headers: { Accept: 'application/vnd.github+json' } })
     .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
     .then((list) => render(Array.isArray(list) ? list.filter((r) => !r.draft) : []))

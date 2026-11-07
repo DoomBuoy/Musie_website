@@ -1,0 +1,55 @@
+# Publishes the website to GitHub Pages together with the newest APK and
+# plugin, so the download buttons are plain same-site links
+# (downloads/musie.apk) instead of redirects to GitHub's file servers.
+#
+# Runs when the app repo's workflow publishes a release here, when the site
+# itself changes, or by hand. Needs Settings → Pages → Source: GitHub Actions.
+
+name: Deploy site
+
+on:
+  release:
+    types: [published]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add the newest APK and plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p downloads
+          if gh release view --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release download --repo "$GITHUB_REPOSITORY" \
+              --pattern musie.apk --pattern ystream-plugin.zip --dir downloads --clobber
+          else
+            echo "No release yet: site goes up without downloads."
+          fi
+          ls -la downloads
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
