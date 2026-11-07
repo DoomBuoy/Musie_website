@@ -166,3 +166,12 @@ h2 { font-size: clamp(28px, 4vw, 38px); letter-spacing: -.6px; margin: 0 0 8px; 
   .cta .btn { flex: 1 1 100%; }
 }
 .meta.tip { margin-top: 6px; font-size: 13px; }
+
+/* Jumping to a section: stop below the sticky header. The Download jump
+   stops with the buttons mid-screen, and the main button pulses. */
+section[id] { scroll-margin-top: 72px; }
+#download { scroll-margin-top: 38vh; }
+#download:target .btn-main { animation: flash 1s ease-in-out 2; }
+@keyframes flash {
+  50% { transform: scale(1.06); box-shadow: 0 0 0 8px rgba(180, 76, 255, .25), 0 14px 38px rgba(180, 76, 255, .5); }
+}
