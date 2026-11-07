@@ -45,6 +45,11 @@ jobs:
           fi
           ls -la downloads
 
+      - name: Stamp this deploy on CSS/JS links
+        # Browsers may keep old copies for ~10 minutes; a new ?v= per deploy
+        # makes a fresh page always load the matching CSS and JS.
+        run: sed -i "s/?v=dev/?v=${GITHUB_SHA::7}/g" index.html
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
