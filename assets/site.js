@@ -1,3 +1,20 @@
+// Android: "Get the YStream plugin" opens Musie (musie://install-plugin),
+// which downloads and installs the plugin in one tap. If Musie isn't
+// installed (or is too old to know the link), Chrome falls back to
+// downloading the zip. Inside Musie's Online tab the app catches the tap
+// itself before this runs.
+(function () {
+  const btn = document.getElementById('pluginBtn');
+  if (!btn || !/Android/i.test(navigator.userAgent)) return;
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const zip = new URL(btn.getAttribute('href'), location.href).href;
+    location.href = 'intent://install-plugin#Intent;scheme=musie;' +
+      'package=com.doombuoy.musie;S.browser_fallback_url=' +
+      encodeURIComponent(zip) + ';end';
+  });
+})();
+
 // Fills in the latest version and the changelog from this repo's GitHub
 // Releases (created automatically by the app repo's build workflow).
 (function () {
