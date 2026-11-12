@@ -2,14 +2,19 @@
 # plugin, so the download buttons are plain same-site links
 # (downloads/musie.apk) instead of redirects to GitHub's file servers.
 #
-# Runs when the app repo's workflow publishes a release here, when the site
-# itself changes, or by hand. Needs Settings → Pages → Source: GitHub Actions.
+# Runs when the app repo's workflow publishes a release here (it then sends
+# an "app-release" repository_dispatch), when the site itself changes, or by
+# hand. Needs Settings → Pages → Source: GitHub Actions.
+#
+# Not triggered by the `release` event: that run belongs to the release's
+# tag, and the github-pages environment only deploys from master.
+# repository_dispatch always runs on master.
 
 name: Deploy site
 
 on:
-  release:
-    types: [published]
+  repository_dispatch:
+    types: [app-release]
   push:
     branches: [master]
   workflow_dispatch:
